@@ -5,7 +5,12 @@ import Log from './components/Log';
 import { WINNING_COMBINATIONS } from './winning-combination';
 import GameOver from './components/GameOver';
 
-const initialGameBoard = [
+const PLAYERS = {
+  X: 'Player 1',
+  O: 'Player 2',
+};
+
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
@@ -24,12 +29,13 @@ function deriveActivePlayer(gameTurns) {
 
 function App() {
   const [gameTurns, setGameTurns] = useState([]);
+  const [players, setPlayers] = useState(PLAYERS);
   // const [hasWinner, setHasWinner] = useState(false);
   // const [activePlayer, setActivePlayer] = useState('X');
 
   const activePlayer = deriveActivePlayer(gameTurns);
 
-  let gameBoard = [...initialGameBoard.map((innerArray) => [...innerArray])];
+  let gameBoard = [...INITIAL_GAME_BOARD.map((innerArray) => [...innerArray])];
 
   for (const turn of gameTurns) {
     // 리스타트를 하는데도 안 되는 이유는 gameBoard를 수정했을 때 원본이 같이 변경되기 때문이다. -> 참조타입은 깊은복사!!!
@@ -54,7 +60,7 @@ function App() {
       firstSquareSymbol === secondSquareSymbol &&
       firstSquareSymbol === thirdSquareSymbol
     ) {
-      winner = firstSquareSymbol;
+      winner = players[firstSquareSymbol];
     }
   }
 
@@ -79,19 +85,27 @@ function App() {
     setGameTurns([]);
   }
 
+  function handlePlayerNameChange(symbol, newName) {
+    setPlayers((prevPlayers) => {
+      return { ...prevPlayers, [symbol]: newName };
+    });
+  }
+
   return (
     <main>
       <div id='game-container'>
         <ol id='players' className='highlight-player'>
           <Player
-            initialName={'Player 1'}
+            initialName={PLAYERS.X}
             symbol={'X'}
             isActive={activePlayer === 'X'}
+            onChangeName={handlePlayerNameChange}
           />
           <Player
-            initialName={'Player 2'}
+            initialName={PLAYERS.O}
             symbol={'O'}
             isActive={activePlayer === 'O'}
+            onChangeName={handlePlayerNameChange}
           />
         </ol>
         {(winner || hasDraw) && (
